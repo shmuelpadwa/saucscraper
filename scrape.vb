@@ -19,15 +19,19 @@ Sub Scrape()
     'phrase, occurrences, and intCursor are used in the function counting the number of dists.
     'I just realized I actually did that twice, could probably cut the runtime in half by changing that
     
-    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath As String
-    alength = "49.23"
-    blength = "67.39"
-    clength = "65.99"
+    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath, centering, centeringxpath, proteincolumn, distcolumn, pora, poraxpath As String
+    alength = "100"
+    blength = "100"
+    clength = "100"
     alphaangle = "90"
-    betaangle = "101.8"
+    betaangle = "90"
     gammaangle = "90"
-    myMetric = "NCDist" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
-    spheresort = "d" 'In quotes, put f or family or d or distance
+    myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
+    spheresort = "f" 'In quotes, put f or family or d or distance
+    centering = "B" 'In quotes, put lattice centering as P, A, B, C, F, I, R, H, V
+    pora = "a" 'Percent or Angstroms. Put p or a or P or A
+    proteincolumn = "A" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
+    distcolumn = "B" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
     Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
 
 
@@ -66,6 +70,41 @@ Sub Scrape()
     End If
     Driver.Wait 500
     Driver.FindElementByXPath(spheresortxpath).Click
+    
+    'Lattice Centering Chooser, defaults to P
+    If StrComp(centering, "A") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[2]"
+    ElseIf StrComp(centering, "B") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[3]"
+    ElseIf StrComp(centering, "C") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[4]"
+    ElseIf StrComp(centering, "F") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[5]"
+    ElseIf StrComp(centering, "I") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[6]"
+    ElseIf StrComp(centering, "R") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[7]"
+    ElseIf StrComp(centering, "H") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[8]"
+    ElseIf StrComp(centering, "V") = 0 Then
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[9]"
+    Else
+        centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[1]"
+    End If
+    
+    Driver.Wait 500
+    Driver.FindElementByXPath(centeringxpath).Click
+    
+    'Percent or Angstroms, defaults to percent
+    If StrComp(pora, "a") = 0 Or StrComp(pora, "A") = 0 Or StrComp(pora, "angstroms") = 0 Or StrComp(pora, "Angstroms") = 0 Then 'I actually can't remember if this is case sensitive
+        poraxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[9]/td/input[3]"
+    Else
+        poraxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[9]/td/input[2]"
+    End If
+    
+    Driver.Wait 500
+    Driver.FindElementByXPath(poraxpath).Click
+    
     
     'A
     Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/input").Click
@@ -132,7 +171,7 @@ Sub Scrape()
         For Each r0 In mcolResults0
             Dim s0 As String
             s0 = Replace(r0, " Dist:", "", 1, 1)
-            Range("B" & count0) = s0
+            Range(proteincolumn & count0) = s0
             count0 = count0 + 1
         Next r0
     End If
@@ -146,7 +185,7 @@ Sub Scrape()
         For Each r1 In mcolResults
             Dim s1 As String
             s1 = Replace(r1, "Dist: ", "", 1, 1) 'For some reason this turns "-0" into "0". Not really an issue though
-            Range("C" & count1) = s1
+            Range(distcolumn & count1) = s1
             count1 = count1 + 1
         Next r1
     End If
