@@ -21,19 +21,43 @@ Sub Scrape()
     'phrase, occurrences, and intCursor are used in the function counting the number of dists.
     'I just realized I actually did that twice, could probably cut the runtime in half by changing that
     
-    Dim alength, blength, clength, alphaangle, betaangle, gammaangle As String
+    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath As String
     alength = "42.018"
     blength = "81.033"
     clength = "110.507"
     alphaangle = "90"
     betaangle = "90"
     gammaangle = "90"
-    Sheets("Protein1").Activate
+    myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
+    Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
 
 
     Set Driver = CreateObject("Selenium.ChromeDriver")
     
     Driver.Get "http://iterate.sourceforge.net/sauc-1.1.1/"
+    
+    'Metric Selector, defaults to S6
+    If StrComp(myMetric, "L1") = 0 Then
+        metricxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[4]/td/input[1]"
+        'Debug.Print metricxpath
+    ElseIf StrComp(myMetric, "L2") = 0 Then
+        metricxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[4]/td/input[2]"
+        'Debug.Print metricxpath
+    ElseIf StrComp(myMetric, "NCDist") = 0 Then
+        metricxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[4]/td/input[3]"
+        'Debug.Print metricxpath
+    ElseIf StrComp(myMetric, "V7") = 0 Then
+        metricxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[4]/td/input[4]"
+        'Debug.Print metricxpath
+    ElseIf StrComp(myMetric, "D7") = 0 Then
+        metricxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[4]/td/input[5]"
+        'Debug.Print metricxpath
+    Else
+        metricxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[4]/td/input[6]"
+        'Debug.Print metricxpath
+    End If
+    Driver.Wait 500
+    Driver.FindElementByXPath(metricxpath).Click
     
     'A
     Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/input").Click
