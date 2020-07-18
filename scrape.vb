@@ -1,6 +1,26 @@
 Sub Scrape()
 
     Dim Driver As New Selenium.ChromeDriver
+    
+    'User-editable stuff begins here
+    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath, centering, centeringxpath, proteincolumn, distcolumn, pora, poraxpath, maxradius, hitlimit As String
+    alength = "100" 'edit lengths and angles as needed. Keep the quotes!
+    blength = "100"
+    clength = "100"
+    alphaangle = "90"
+    betaangle = "90"
+    gammaangle = "90"
+    myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
+    spheresort = "f" 'In quotes, put f or family or d or distance
+    centering = "P" 'In quotes, put lattice centering as P, A, B, C, F, I, R, H, V
+    pora = "p" 'Percent or Angstroms. Put p or a or P or A
+    maxradius = "2.5" 'Max radius of the sphere, whether percent or Angstroms
+    hitlimit = "50" 'Maximum number of results
+    proteincolumn = "A" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
+    distcolumn = "B" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
+    Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
+    'end of user-editable stuff
+    
     Dim count0 As Long
     Dim count1 As Long
     count0 = 1
@@ -18,22 +38,6 @@ Sub Scrape()
 
     'phrase, occurrences, and intCursor are used in the function counting the number of dists.
     'I just realized I actually did that twice, could probably cut the runtime in half by changing that
-    
-    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath, centering, centeringxpath, proteincolumn, distcolumn, pora, poraxpath As String
-    alength = "100"
-    blength = "100"
-    clength = "100"
-    alphaangle = "90"
-    betaangle = "90"
-    gammaangle = "90"
-    myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
-    spheresort = "f" 'In quotes, put f or family or d or distance
-    centering = "P" 'In quotes, put lattice centering as P, A, B, C, F, I, R, H, V
-    pora = "p" 'Percent or Angstroms. Put p or a or P or A
-    proteincolumn = "A" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
-    distcolumn = "B" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
-    Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
-
 
     Set Driver = CreateObject("Selenium.ChromeDriver")
     
@@ -105,6 +109,15 @@ Sub Scrape()
     Driver.Wait 500
     Driver.FindElementByXPath(poraxpath).Click
     
+    'Maximum Radius
+    Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[9]/td/input[1]").Click
+    Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[9]/td/input[1]").Clear
+    Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[9]/td/input[1]").SendKeys maxradius
+    
+    'Hit limit
+    Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[5]/td/input").Click
+    Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[5]/td/input").Clear
+    Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[5]/td/input").SendKeys hitlimit
     
     'A
     Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/input").Click
