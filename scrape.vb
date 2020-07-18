@@ -29,7 +29,7 @@ Sub Scrape()
     myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
     spheresort = "f" 'In quotes, put f or family or d or distance
     centering = "B" 'In quotes, put lattice centering as P, A, B, C, F, I, R, H, V
-    pora = "a" 'Percent or Angstroms. Put p or a or P or A
+    pora = "p" 'Percent or Angstroms. Put p or a or P or A
     proteincolumn = "A" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
     distcolumn = "B" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
     Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
