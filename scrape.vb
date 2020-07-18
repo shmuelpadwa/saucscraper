@@ -1,15 +1,13 @@
 Sub Scrape()
 
     Dim Driver As New Selenium.ChromeDriver
-    Dim count As Long
-    Dim count2 As Long
-    count = 1
-    count2 = 1
+    Dim count0 As Long
+    Dim count1 As Long
+    count0 = 1
+    count1 = 1
     'Both counts will be used for essentially the same purpose.
-    'But count1 will be incremented in a while loop
-    'count2 in a for loop
 
-    Dim s As String 's will have the entire page of html
+    Dim s As String 's will have the entire page of text
 
     Dim phrase As String
     phrase = "Dist:"
@@ -21,14 +19,15 @@ Sub Scrape()
     'phrase, occurrences, and intCursor are used in the function counting the number of dists.
     'I just realized I actually did that twice, could probably cut the runtime in half by changing that
     
-    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath As String
-    alength = "42.018"
-    blength = "81.033"
-    clength = "110.507"
+    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath As String
+    alength = "49.23"
+    blength = "67.39"
+    clength = "65.99"
     alphaangle = "90"
-    betaangle = "90"
+    betaangle = "101.8"
     gammaangle = "90"
-    myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
+    myMetric = "NCDist" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
+    spheresort = "d" 'In quotes, put f or family or d or distance
     Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
 
 
@@ -58,6 +57,15 @@ Sub Scrape()
     End If
     Driver.Wait 500
     Driver.FindElementByXPath(metricxpath).Click
+    
+    'Sphere Sort Chooser, defaults to family
+    If StrComp(spheresort, "d") = 0 Or StrComp(spheresort, "distance") = 0 Then
+        spheresortxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[10]/td/input[2]"
+    Else
+        spheresortxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[10]/td/input[1]"
+    End If
+    Driver.Wait 500
+    Driver.FindElementByXPath(spheresortxpath).Click
     
     'A
     Driver.FindElementByXPath("/html/body/font/center[3]/p/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/input").Click
@@ -114,31 +122,35 @@ Sub Scrape()
         End If
         
     Loop
-        
-    While (count < occurrences)
-        Range("B" & count) = Driver.FindElementByXPath("/html/body/font/pre/font/b[" + Str(count) + "]/a").Text
-        
-        count = count + 1
     
-
-    Wend
+    Dim r0 As Match
+    Dim mcolResults0 As MatchCollection
+    Dim regexZero As String
+    regexZero = "\s\w{4}\sDist:"
+    Set mcolResults0 = RegEx(s, regexZero, True, , True)
+    If Not mcolResults0 Is Nothing Then
+        For Each r0 In mcolResults0
+            Dim s0 As String
+            s0 = Replace(r0, " Dist:", "", 1, 1)
+            Range("B" & count0) = s0
+            count0 = count0 + 1
+        Next r0
+    End If
     
-    
-    Dim r As Match
+    Dim r1 As Match
     Dim mcolResults As MatchCollection
     Dim regexOne As String
     regexOne = "Dist:\s([^\s]+)"
     Set mcolResults = RegEx(s, regexOne, True, , True)
     If Not mcolResults Is Nothing Then
-        For Each r In mcolResults
+        For Each r1 In mcolResults
             Dim s1 As String
-            s1 = Replace(r, "Dist: ", "", 1, 1) 'For some reason this turns "-0" into "0". Not really an issue though
-            Range("C" & count2) = s1
-            count2 = count2 + 1
-        Next r
+            s1 = Replace(r1, "Dist: ", "", 1, 1) 'For some reason this turns "-0" into "0". Not really an issue though
+            Range("C" & count1) = s1
+            count1 = count1 + 1
+        Next r1
     End If
     
     
     Driver.Quit
-        
 End Sub
