@@ -16,9 +16,9 @@ Sub Scrape()
     pora = "p" 'Percent or Angstroms. Put p or a or P or A
     maxradius = "2.5" 'Max radius of the sphere, whether percent or Angstroms
     hitlimit = "50" 'Maximum number of results
-    proteincolumn = "C" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
-    distcolumn = "D" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
-    Sheets("4Z7X").Activate 'In quotes, put the name of the specific sheet
+    proteincolumn = "A" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
+    distcolumn = "B" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
+    Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
     'end of user-editable stuff
     
     Dim count0 As Long
