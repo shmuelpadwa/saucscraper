@@ -16,9 +16,9 @@ Sub Scrape()
     pora = "p" 'Percent or Angstroms. Put p or a or P or A
     maxradius = "2.5" 'Max radius of the sphere, whether percent or Angstroms
     hitlimit = "50" 'Maximum number of results
-    proteincolumn = "A" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
-    distcolumn = "B" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
-    Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
+    proteincolumn = "C" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
+    distcolumn = "D" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
+    Sheets("4Z7X").Activate 'In quotes, put the name of the specific sheet
     'end of user-editable stuff
     
     Dim count0 As Long
@@ -76,21 +76,21 @@ Sub Scrape()
     Driver.FindElementByXPath(spheresortxpath).Click
     
     'Lattice Centering Chooser, defaults to P
-    If StrComp(centering, "A") = 0 Then
+    If StrComp(centering, "A") = 0 Or StrComp(centering, "a") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[2]"
-    ElseIf StrComp(centering, "B") = 0 Then
+    ElseIf StrComp(centering, "B") = 0 Or StrComp(centering, "b") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[3]"
-    ElseIf StrComp(centering, "C") = 0 Then
+    ElseIf StrComp(centering, "C") = 0 Or StrComp(centering, "c") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[4]"
-    ElseIf StrComp(centering, "F") = 0 Then
+    ElseIf StrComp(centering, "F") = 0 Or StrComp(centering, "f") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[5]"
-    ElseIf StrComp(centering, "I") = 0 Then
+    ElseIf StrComp(centering, "I") = 0 Or StrComp(centering, "i") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[6]"
-    ElseIf StrComp(centering, "R") = 0 Then
+    ElseIf StrComp(centering, "R") = 0 Or StrComp(centering, "r") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[7]"
-    ElseIf StrComp(centering, "H") = 0 Then
+    ElseIf StrComp(centering, "H") = 0 Or StrComp(centering, "h") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[8]"
-    ElseIf StrComp(centering, "V") = 0 Then
+    ElseIf StrComp(centering, "V") = 0 Or StrComp(centering, "v") = 0 Then
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[9]"
     Else
         centeringxpath = "/html/body/font/center[3]/p/table/tbody/tr/td[1]/table/tbody/tr[2]/td/select/option[1]"
@@ -184,10 +184,13 @@ Sub Scrape()
         For Each r0 In mcolResults0
             Dim s0 As String
             s0 = Replace(r0, " Dist:", "", 1, 1)
-            Range(proteincolumn & count0) = s0
+            Range(proteincolumn & (count0 + 1)) = s0 'this leaves a space for the stop of the column
             count0 = count0 + 1
         Next r0
     End If
+    
+    Range(proteincolumn & 1) = myMetric + " Closest proteins"
+    Range(distcolumn & 1) = myMetric + " Distances"
     
     Dim r1 As Match
     Dim mcolResults As MatchCollection
@@ -198,7 +201,7 @@ Sub Scrape()
         For Each r1 In mcolResults
             Dim s1 As String
             s1 = Replace(r1, "Dist: ", "", 1, 1) 'For some reason this turns "-0" into "0". Not really an issue though
-            Range(distcolumn & count1) = s1
+            Range(distcolumn & (count1 + 1)) = s1
             count1 = count1 + 1
         Next r1
     End If
