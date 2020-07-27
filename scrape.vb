@@ -1,9 +1,9 @@
-
 Sub Scrape()
 
     Dim Driver As New Selenium.ChromeDriver
     
     'User-editable stuff begins here
+    Dim spacegroupfinder As Boolean
     Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath, centering, centeringxpath, proteincolumn, distcolumn, spacegroupcolumn, pora, poraxpath, maxradius, hitlimit As String
     alength = "100" 'edit lengths and angles as needed. Keep the quotes!
     blength = "100"
@@ -17,6 +17,7 @@ Sub Scrape()
     pora = "p" 'Percent or Angstroms. Put p or a or P or A
     maxradius = "2.5" 'Max radius of the sphere, whether percent or Angstroms
     hitlimit = "50" 'Maximum number of results
+    spacegroupfinder = False ' Set to true if you also want to find spacegroups for nearby proteins. Be aware of column usage
     proteincolumn = "C" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
     distcolumn = "D" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
     spacegroupcolumn = "E"
@@ -190,16 +191,19 @@ Sub Scrape()
             t0 = Replace(s0, " ", "", 1, 1)
             Range(proteincolumn & (count0 + 1)) = t0 'this leaves a space for the top of the column
             'Spacegroups of friends
-            Dim PDBDriver As New Selenium.ChromeDriver 'create a new chromedriver to avoid annoying system failures
-            Set PDBDriver = CreateObject("Selenium.ChromeDriver")
-            Dim longstring, spacegroup, spacegroupsend As String
-            longstring = "https://www.rcsb.org/structure/" + t0 'go to each individual molecule
-            PDBDriver.Get longstring
-            spacegroup = PDBDriver.FindElementById("exp_undefined_xray_spaceGroup").Text 'get spacegroup
-            spacegroupsend = Replace(spacegroup, "Space Group: ", "", 1, 1)
-            Range(spacegroupcolumn & (count0 + 1)) = spacegroupsend 'put in column
-            PDBDriver.Quit ' very important to quit the driver. for memory or something
-            'Actually maybe it isn't, but better safe than sorry
+            If spacegroupfinder = True Then
+            
+                Dim PDBDriver As New Selenium.ChromeDriver 'create a new chromedriver to avoid annoying system failures
+                Set PDBDriver = CreateObject("Selenium.ChromeDriver")
+                Dim longstring, spacegroup, spacegroupsend As String
+                longstring = "https://www.rcsb.org/structure/" + t0 'go to each individual molecule
+                PDBDriver.Get longstring
+                spacegroup = PDBDriver.FindElementById("exp_undefined_xray_spaceGroup").Text 'get spacegroup
+                spacegroupsend = Replace(spacegroup, "Space Group: ", "", 1, 1)
+                Range(spacegroupcolumn & (count0 + 1)) = spacegroupsend 'put in column
+                PDBDriver.Quit ' very important to quit the driver. for memory or something
+                'Actually maybe it isn't, but better safe than sorry
+            End If
             count0 = count0 + 1
         Next r0
     End If
