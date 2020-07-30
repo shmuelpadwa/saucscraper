@@ -2,27 +2,60 @@ Sub Scrape()
 
     Dim Driver As New Selenium.ChromeDriver
     
+    
+    Dim FirstDriver As New Selenium.ChromeDriver
+    Set FirstDriver = CreateObject("Selenium.ChromeDriver")
+    Dim protein, url As String
+    
     'User-editable stuff begins here
     Dim spacegroupfinder As Boolean
-    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, myMetric, metricxpath, spheresort, spheresortxpath, centering, centeringxpath, proteincolumn, distcolumn, spacegroupcolumn, pora, poraxpath, maxradius, hitlimit As String
-    alength = "100" 'edit lengths and angles as needed. Keep the quotes!
-    blength = "100"
-    clength = "100"
-    alphaangle = "90"
-    betaangle = "90"
-    gammaangle = "90"
+    Dim myMetric, metricxpath, spheresort, spheresortxpath, centering, centeringxpath, proteincolumn, distcolumn, spacegroupcolumn, pora, poraxpath, maxradius, hitlimit As String
+    protein = "6QNJ" 'MOST IMPORTANT LINE! EDIT THIS!
     myMetric = "S6" 'In quotes, put S6, L1, L2, NCDist, V7, or D7
     spheresort = "f" 'In quotes, put f or family or d or distance
-    centering = "P" 'In quotes, put lattice centering as P, A, B, C, F, I, R, H, V
-    pora = "p" 'Percent or Angstroms. Put p or a or P or A
-    maxradius = "2.5" 'Max radius of the sphere, whether percent or Angstroms
-    hitlimit = "50" 'Maximum number of results
-    spacegroupfinder = False ' Set to true if you also want to find spacegroups for nearby proteins. Be aware of column usage
-    proteincolumn = "C" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
-    distcolumn = "D" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
-    spacegroupcolumn = "E"
-    Sheets("Protein1").Activate 'In quotes, put the name of the specific sheet
+    pora = "a" 'Percent or Angstroms. Put p or a or P or A
+    maxradius = "5" 'Max radius of the sphere, whether percent or Angstroms
+    hitlimit = "15" 'Maximum number of results
+    spacegroupfinder = True ' Set to true if you also want to find spacegroups for nearby proteins. Be aware of column usage
+    proteincolumn = "H" 'Put column of excel sheet you want to have protein names. Shift over by two to run a different metric on the same numbers.
+    distcolumn = "I" 'Put column of excel sheet you want to have distances. Shift over by two to run a different metric on the same numbers.
+    spacegroupcolumn = "J"
     'end of user-editable stuff
+    
+    url = "https://www.rcsb.org/structure/" + protein
+    FirstDriver.Get url
+    
+    Dim alength, blength, clength, alphaangle, betaangle, gammaangle, originspacegroup, originspacegroupsend As String
+    alength = FirstDriver.FindElementByXPath("//*[@id=""unitCellTable""]/tbody/tr[1]/td[1]").TextAsNumber
+    blength = FirstDriver.FindElementByXPath("//*[@id=""unitCellTable""]/tbody/tr[2]/td[1]").TextAsNumber
+    clength = FirstDriver.FindElementByXPath("//*[@id=""unitCellTable""]/tbody/tr[3]/td[1]").TextAsNumber
+    alphaangle = FirstDriver.FindElementByXPath("//*[@id=""unitCellTable""]/tbody/tr[1]/td[2]").TextAsNumber
+    betaangle = FirstDriver.FindElementByXPath("//*[@id=""unitCellTable""]/tbody/tr[2]/td[2]").TextAsNumber
+    gammaangle = FirstDriver.FindElementByXPath("//*[@id=""unitCellTable""]/tbody/tr[3]/td[2]").TextAsNumber
+    originspacegroup = FirstDriver.FindElementById("exp_undefined_xray_spaceGroup").Text 'get spacegroup
+    originspacegroupsend = Replace(originspacegroup, "Space Group: ", "", 1, 1)
+    centering = Left(originspacegroupsend, 1)
+    'centering = "P" 'In quotes, put lattice centering as P, A, B, C, F, I, R, H, V
+    Debug.Print (centering)
+    
+    
+    Sheets(protein).Activate
+    Range("A" & 1) = "A length"
+    Range("B" & 1) = "B length"
+    Range("C" & 1) = "C length"
+    Range("D" & 1) = "Alpha angle"
+    Range("E" & 1) = "Beta angle"
+    Range("F" & 1) = "Gamma angle"
+    Range("G" & 1) = "Space Group"
+    Range("A" & 2) = alength
+    Range("B" & 2) = blength
+    Range("C" & 2) = clength
+    Range("D" & 2) = alphaangle
+    Range("E" & 2) = betaangle
+    Range("F" & 2) = gammaangle
+    Range("G" & 2) = originspacegroupsend
+    
+    FirstDriver.Quit
     
     Dim count0 As Long
     Dim count1 As Long
@@ -225,6 +258,7 @@ Sub Scrape()
             count1 = count1 + 1
         Next r1
     End If
+    
     
     
     Driver.Quit
